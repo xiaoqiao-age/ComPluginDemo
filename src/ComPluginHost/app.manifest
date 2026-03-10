@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <!-- 应用程序标识 -->
+  <assemblyIdentity
+    type="win32"
+    name="ComPluginHost"
+    version="1.0.0.0"
+    processorArchitecture="*" />
+
+  <description>COM Plugin Host - Avalonia (Reg-Free COM)</description>
+
+  <!-- ============================================================ -->
+  <!--  SxS 依赖声明 (免注册 COM - 静态依赖)                         -->
+  <!--                                                              -->
+  <!--  规则: 只在此处声明 DLL 已确实存在的组件                       -->
+  <!--  SxS 加载器启动时会验证所有 dependentAssembly                 -->
+  <!--  引用的 manifest + file 必须全部存在, 否则进程拒绝启动         -->
+  <!--                                                              -->
+  <!--  搜索顺序:                                                    -->
+  <!--    1. exe 同目录: <name>.manifest                             -->
+  <!--    2. 同名子目录: <name>\<name>.manifest                     -->
+  <!--                                                              -->
+  <!--  尚未编译/部署的插件 (如 VB6) 不要放在这里                    -->
+  <!--  改用 plugins.json + ActivationContext API 动态加载           -->
+  <!-- ============================================================ -->
+
+  <!-- C# COM 插件: Calculator (构建时自动复制到 CSharpComPlugin\ 子目录) -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+        type="win32"
+        name="CSharpComPlugin"
+        version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+
+  <!-- C# COM 插件: ServiceC (构建时自动复制到 ServiceCPlugin\ 子目录) -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+        type="win32"
+        name="ServiceCPlugin"
+        version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+
+  <!-- C# COM 插件: OrchestratorB (构建时自动复制到 OrchestratorBPlugin\ 子目录) -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+        type="win32"
+        name="OrchestratorBPlugin"
+        version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+
+  <!--
+    VB6 COM 插件: 不在此声明 (DLL 需 VB6 IDE 编译后才存在)
+    通过 plugins.json 的 ManifestPath + ActivationContext API 动态加载
+    当 VB6ComPlugin.dll 编译完成并放入 VB6ComPlugin\ 子目录后,
+    可取消下方注释将其改为静态依赖:
+
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+        type="win32"
+        name="VB6ComPlugin"
+        version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+  -->
+
+  <!-- Windows 版本兼容性声明 (替换 .NET SDK 默认清单后需补回) -->
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}" /> <!-- Vista / Server 2008 -->
+      <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" /> <!-- Windows 7 / Server 2008 R2 -->
+      <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}" /> <!-- Windows 8 / Server 2012 -->
+      <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" /> <!-- Windows 8.1 / Server 2012 R2 -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" /> <!-- Windows 10 / 11 -->
+    </application>
+  </compatibility>
+
+  <!-- UAC 执行级别 -->
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+
+  <!-- DPI 感知 -->
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2</dpiAwareness>
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+    </windowsSettings>
+  </application>
+
+</assembly>

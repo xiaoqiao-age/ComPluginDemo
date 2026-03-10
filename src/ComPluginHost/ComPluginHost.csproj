@@ -1,0 +1,200 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <!-- x86: VB6 COM 只有 32 位, 宿主进程必须也是 32 位 -->
+    <PlatformTarget>x86</PlatformTarget>
+    <!-- 嵌入 SxS 应用清单到 exe -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="plugins.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!--
+    构建后自动复制 C# COM 插件到输出目录的 CSharpComPlugin 子目录
+    SxS 加载器会在同名子目录中搜索组件清单:
+      CSharpComPlugin\CSharpComPlugin.manifest
+  -->
+  <Target Name="CopyCSharpComPlugin" AfterTargets="Build"
+          DependsOnTargets="Build">
+    <PropertyGroup>
+      <CSharpPluginSource>..\CSharpComPlugin\bin\$(Configuration)\net8.0</CSharpPluginSource>
+      <CSharpPluginDest>$(OutputPath)CSharpComPlugin</CSharpPluginDest>
+    </PropertyGroup>
+    <ItemGroup>
+      <CSharpPluginFiles Include="$(CSharpPluginSource)\CSharpComPlugin.dll"
+                         Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.dll')" />
+      <CSharpPluginFiles Include="$(CSharpPluginSource)\CSharpComPlugin.comhost.dll"
+                         Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.comhost.dll')" />
+      <CSharpPluginFiles Include="$(CSharpPluginSource)\CSharpComPlugin.deps.json"
+                         Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.deps.json')" />
+      <CSharpPluginFiles Include="$(CSharpPluginSource)\CSharpComPlugin.runtimeconfig.json"
+                         Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.runtimeconfig.json')" />
+      <CSharpPluginManifest Include="..\CSharpComPlugin\CSharpComPlugin.manifest"
+                            Condition="Exists('..\CSharpComPlugin\CSharpComPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(CSharpPluginDest)" />
+    <Copy SourceFiles="@(CSharpPluginFiles)" DestinationFolder="$(CSharpPluginDest)"
+          SkipUnchangedFiles="true" ContinueOnError="WarnAndContinue" />
+    <Copy SourceFiles="@(CSharpPluginManifest)" DestinationFolder="$(CSharpPluginDest)"
+          SkipUnchangedFiles="true" ContinueOnError="WarnAndContinue" />
+    <Message Text="Copied CSharpComPlugin to $(CSharpPluginDest)" Importance="high" />
+  </Target>
+
+  <!--
+    创建 VB6ComPlugin 占位目录和清单
+    VB6 编译后需手动将 VB6ComPlugin.dll 放入此目录
+  -->
+  <Target Name="PrepareVB6PluginDir" AfterTargets="Build"
+          DependsOnTargets="CopyCSharpComPlugin">
+    <PropertyGroup>
+      <VB6PluginDest>$(OutputPath)VB6ComPlugin</VB6PluginDest>
+    </PropertyGroup>
+    <ItemGroup>
+      <VB6PluginManifest Include="..\VB6ComPlugin\VB6ComPlugin.manifest"
+                         Condition="Exists('..\VB6ComPlugin\VB6ComPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(VB6PluginDest)" />
+    <Copy SourceFiles="@(VB6PluginManifest)" DestinationFolder="$(VB6PluginDest)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!--
+    复制 CSharpComPlugin 到 VB6ComPlugin 子目录
+    VB6ComPlugin.manifest 声明了 <dependency> CSharpComPlugin,
+    SxS 会在 VB6ComPlugin/CSharpComPlugin/ 下搜索组件清单
+  -->
+  <Target Name="CopyCSharpToVB6SubDir" AfterTargets="PrepareVB6PluginDir">
+    <PropertyGroup>
+      <CSharpPluginSource>..\..\src\CSharpComPlugin\bin\$(Configuration)\net8.0</CSharpPluginSource>
+      <CSharpToVB6Dest>$(OutputPath)VB6ComPlugin\CSharpComPlugin</CSharpToVB6Dest>
+    </PropertyGroup>
+    <ItemGroup>
+      <CSharpToVB6Files Include="$(CSharpPluginSource)\CSharpComPlugin.dll"
+                        Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.dll')" />
+      <CSharpToVB6Files Include="$(CSharpPluginSource)\CSharpComPlugin.comhost.dll"
+                        Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.comhost.dll')" />
+      <CSharpToVB6Files Include="$(CSharpPluginSource)\CSharpComPlugin.deps.json"
+                        Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.deps.json')" />
+      <CSharpToVB6Files Include="$(CSharpPluginSource)\CSharpComPlugin.runtimeconfig.json"
+                        Condition="Exists('$(CSharpPluginSource)\CSharpComPlugin.runtimeconfig.json')" />
+      <CSharpToVB6Manifest Include="..\..\src\CSharpComPlugin\CSharpComPlugin.manifest"
+                           Condition="Exists('..\..\src\CSharpComPlugin\CSharpComPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(CSharpToVB6Dest)" />
+    <Copy SourceFiles="@(CSharpToVB6Files)" DestinationFolder="$(CSharpToVB6Dest)"
+          SkipUnchangedFiles="true" ContinueOnError="WarnAndContinue" />
+    <Copy SourceFiles="@(CSharpToVB6Manifest)" DestinationFolder="$(CSharpToVB6Dest)"
+          SkipUnchangedFiles="true" ContinueOnError="WarnAndContinue" />
+    <Message Text="Copied CSharpComPlugin to $(CSharpToVB6Dest) (VB6 SxS dependency)" Importance="high" />
+  </Target>
+
+  <!--
+    构建后自动复制 ServiceCPlugin 到输出目录的 ServiceCPlugin 子目录
+    SxS 加载器会在同名子目录中搜索组件清单:
+      ServiceCPlugin\ServiceCPlugin.manifest
+  -->
+  <Target Name="CopyServiceCPlugin" AfterTargets="Build"
+          DependsOnTargets="Build">
+    <PropertyGroup>
+      <ServiceCPluginSource>..\ServiceCPlugin\bin\$(Configuration)\net8.0</ServiceCPluginSource>
+      <ServiceCPluginDest>$(OutputPath)ServiceCPlugin</ServiceCPluginDest>
+    </PropertyGroup>
+    <ItemGroup>
+      <ServiceCPluginFiles Include="$(ServiceCPluginSource)\ServiceCPlugin.dll"
+                           Condition="Exists('$(ServiceCPluginSource)\ServiceCPlugin.dll')" />
+      <ServiceCPluginFiles Include="$(ServiceCPluginSource)\ServiceCPlugin.comhost.dll"
+                           Condition="Exists('$(ServiceCPluginSource)\ServiceCPlugin.comhost.dll')" />
+      <ServiceCPluginFiles Include="$(ServiceCPluginSource)\ServiceCPlugin.deps.json"
+                           Condition="Exists('$(ServiceCPluginSource)\ServiceCPlugin.deps.json')" />
+      <ServiceCPluginFiles Include="$(ServiceCPluginSource)\ServiceCPlugin.runtimeconfig.json"
+                           Condition="Exists('$(ServiceCPluginSource)\ServiceCPlugin.runtimeconfig.json')" />
+      <ServiceCPluginManifest Include="..\ServiceCPlugin\ServiceCPlugin.manifest"
+                              Condition="Exists('..\ServiceCPlugin\ServiceCPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(ServiceCPluginDest)" />
+    <Copy SourceFiles="@(ServiceCPluginFiles)" DestinationFolder="$(ServiceCPluginDest)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ServiceCPluginManifest)" DestinationFolder="$(ServiceCPluginDest)"
+          SkipUnchangedFiles="true" />
+    <Message Text="Copied ServiceCPlugin to $(ServiceCPluginDest)" Importance="high" />
+  </Target>
+
+  <!--
+    构建后自动复制 OrchestratorBPlugin 到输出目录的 OrchestratorBPlugin 子目录
+    SxS 加载器会在同名子目录中搜索组件清单:
+      OrchestratorBPlugin\OrchestratorBPlugin.manifest
+  -->
+  <Target Name="CopyOrchestratorBPlugin" AfterTargets="Build"
+          DependsOnTargets="Build">
+    <PropertyGroup>
+      <OrchestratorBPluginSource>..\OrchestratorBPlugin\bin\$(Configuration)\net8.0</OrchestratorBPluginSource>
+      <OrchestratorBPluginDest>$(OutputPath)OrchestratorBPlugin</OrchestratorBPluginDest>
+    </PropertyGroup>
+    <ItemGroup>
+      <OrchestratorBPluginFiles Include="$(OrchestratorBPluginSource)\OrchestratorBPlugin.dll"
+                                Condition="Exists('$(OrchestratorBPluginSource)\OrchestratorBPlugin.dll')" />
+      <OrchestratorBPluginFiles Include="$(OrchestratorBPluginSource)\OrchestratorBPlugin.comhost.dll"
+                                Condition="Exists('$(OrchestratorBPluginSource)\OrchestratorBPlugin.comhost.dll')" />
+      <OrchestratorBPluginFiles Include="$(OrchestratorBPluginSource)\OrchestratorBPlugin.deps.json"
+                                Condition="Exists('$(OrchestratorBPluginSource)\OrchestratorBPlugin.deps.json')" />
+      <OrchestratorBPluginFiles Include="$(OrchestratorBPluginSource)\OrchestratorBPlugin.runtimeconfig.json"
+                                Condition="Exists('$(OrchestratorBPluginSource)\OrchestratorBPlugin.runtimeconfig.json')" />
+      <OrchestratorBPluginManifest Include="..\OrchestratorBPlugin\OrchestratorBPlugin.manifest"
+                                   Condition="Exists('..\OrchestratorBPlugin\OrchestratorBPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(OrchestratorBPluginDest)" />
+    <Copy SourceFiles="@(OrchestratorBPluginFiles)" DestinationFolder="$(OrchestratorBPluginDest)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(OrchestratorBPluginManifest)" DestinationFolder="$(OrchestratorBPluginDest)"
+          SkipUnchangedFiles="true" />
+    <Message Text="Copied OrchestratorBPlugin to $(OrchestratorBPluginDest)" Importance="high" />
+  </Target>
+
+  <!--
+    复制 ServiceCPlugin 到 OrchestratorBPlugin 子目录
+    OrchestratorBPlugin.manifest 声明了 <dependency> ServiceCPlugin,
+    SxS 会在 OrchestratorBPlugin/ServiceCPlugin/ 下搜索组件清单
+  -->
+  <Target Name="CopyServiceCToOrchestratorBSubDir" AfterTargets="CopyOrchestratorBPlugin">
+    <PropertyGroup>
+      <ServiceCSourceForB>..\..\src\ServiceCPlugin\bin\$(Configuration)\net8.0</ServiceCSourceForB>
+      <ServiceCToOrchestratorBDest>$(OutputPath)OrchestratorBPlugin\ServiceCPlugin</ServiceCToOrchestratorBDest>
+    </PropertyGroup>
+    <ItemGroup>
+      <ServiceCToOrchestratorBFiles Include="$(ServiceCSourceForB)\ServiceCPlugin.dll"
+                                    Condition="Exists('$(ServiceCSourceForB)\ServiceCPlugin.dll')" />
+      <ServiceCToOrchestratorBFiles Include="$(ServiceCSourceForB)\ServiceCPlugin.comhost.dll"
+                                    Condition="Exists('$(ServiceCSourceForB)\ServiceCPlugin.comhost.dll')" />
+      <ServiceCToOrchestratorBFiles Include="$(ServiceCSourceForB)\ServiceCPlugin.deps.json"
+                                    Condition="Exists('$(ServiceCSourceForB)\ServiceCPlugin.deps.json')" />
+      <ServiceCToOrchestratorBFiles Include="$(ServiceCSourceForB)\ServiceCPlugin.runtimeconfig.json"
+                                    Condition="Exists('$(ServiceCSourceForB)\ServiceCPlugin.runtimeconfig.json')" />
+      <ServiceCToOrchestratorBManifest Include="..\..\src\ServiceCPlugin\ServiceCPlugin.manifest"
+                                       Condition="Exists('..\..\src\ServiceCPlugin\ServiceCPlugin.manifest')" />
+    </ItemGroup>
+    <MakeDir Directories="$(ServiceCToOrchestratorBDest)" />
+    <Copy SourceFiles="@(ServiceCToOrchestratorBFiles)" DestinationFolder="$(ServiceCToOrchestratorBDest)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ServiceCToOrchestratorBManifest)" DestinationFolder="$(ServiceCToOrchestratorBDest)"
+          SkipUnchangedFiles="true" />
+    <Message Text="Copied ServiceCPlugin to $(ServiceCToOrchestratorBDest) (OrchestratorB SxS dependency)" Importance="high" />
+  </Target>
+
+</Project>

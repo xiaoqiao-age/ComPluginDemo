@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  CSharpComPlugin - SxS 组件清单 (免注册 COM)
+
+  此清单声明 CSharpComPlugin.comhost.dll 中的 COM 类，
+  使宿主应用无需 regsvr32 即可通过 ProgID 创建 COM 对象。
+
+  Windows SxS 加载器搜索路径:
+    1. 与 exe 同目录: CSharpComPlugin.manifest
+    2. 同名子目录:    CSharpComPlugin\CSharpComPlugin.manifest
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <assemblyIdentity
+    type="win32"
+    name="CSharpComPlugin"
+    version="1.0.0.0" />
+
+  <!--
+    file: 指向实际的 COM 服务器 DLL
+    .NET 8 COM Hosting 生成 comhost.dll 作为原生 COM 入口
+  -->
+  <file name="CSharpComPlugin.comhost.dll">
+
+    <!--
+      comClass: 声明 COM 类
+      clsid:          必须与 C# 代码中 [Guid("...")] 一致
+      threadingModel:  .NET COM 宿主使用 Both
+      progid:          用于 CreateObject / Type.GetTypeFromProgID
+    -->
+    <comClass
+      clsid="{D7E8F9A0-1B2C-3D4E-5F6A-7B8C9D0E1F2A}"
+      threadingModel="Both"
+      progid="ComPluginDemo.Calculator"
+      description="Calculator Plugin - 数学表达式计算器" />
+
+  </file>
+
+  <!--
+    comInterfaceExternalProxyStub: 声明 COM 接口代理
+    使用 OLE Automation 通用代理 (oleaut32.dll) 处理 IDispatch 调度
+  -->
+  <comInterfaceExternalProxyStub
+    iid="{8C5E2B1A-3F4D-4A6E-9B7C-1D2E3F4A5B6C}"
+    name="IComPlugin"
+    proxyStubClsid32="{00020424-0000-0000-C000-000000000046}" />
+
+</assembly>

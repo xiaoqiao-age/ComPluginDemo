@@ -1,0 +1,53 @@
+// CSharpComPlugin Type Library
+// Generated for VB6 early binding reference
+// Interface GUIDs must match C# [Guid] attributes exactly
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+    uuid(A1B2C3D4-E5F6-7890-ABCD-EF1234567890),
+    version(1.0),
+    helpstring("CSharpComPlugin 1.0 Type Library")
+]
+library CSharpComPlugin
+{
+    importlib("stdole2.tlb");
+
+    [
+        object,
+        uuid(8C5E2B1A-3F4D-4A6E-9B7C-1D2E3F4A5B6C),
+        dual,
+        oleautomation,
+        helpstring("COM Plugin Interface")
+    ]
+    interface IComPlugin : IDispatch
+    {
+        [id(1), propget, helpstring("Plugin name")]
+        HRESULT Name([out, retval] BSTR* pVal);
+
+        [id(2), propget, helpstring("Plugin version")]
+        HRESULT Version([out, retval] BSTR* pVal);
+
+        [id(3), propget, helpstring("Plugin description")]
+        HRESULT Description([out, retval] BSTR* pVal);
+
+        [id(4), helpstring("Initialize the plugin")]
+        HRESULT Initialize();
+
+        [id(5), helpstring("Execute a command")]
+        HRESULT Execute([in] BSTR input, [out, retval] BSTR* pVal);
+
+        [id(6), helpstring("Shutdown the plugin")]
+        HRESULT Shutdown();
+    };
+
+    [
+        uuid(D7E8F9A0-1B2C-3D4E-5F6A-7B8C9D0E1F2A),
+        helpstring("Calculator Plugin")
+    ]
+    coclass CalculatorPlugin
+    {
+        [default] interface IComPlugin;
+    };
+};

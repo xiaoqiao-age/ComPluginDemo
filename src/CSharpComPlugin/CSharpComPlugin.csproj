@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableComHosting>true</EnableComHosting>
+    <EnableRegFreeCom>true</EnableRegFreeCom>
+    <!-- x86: VB6 COM 只有 32 位, comhost.dll 必须匹配 -->
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+</Project>

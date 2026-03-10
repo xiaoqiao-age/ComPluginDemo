@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ServiceCPlugin - SxS 组件清单 (免注册 COM)
+
+  此清单声明 ServiceCPlugin.comhost.dll 中的 COM 类，
+  使宿主应用无需 regsvr32 即可通过 ProgID 创建 COM 对象。
+
+  Windows SxS 加载器搜索路径:
+    1. 与 exe 同目录: ServiceCPlugin.manifest
+    2. 同名子目录:    ServiceCPlugin\ServiceCPlugin.manifest
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <assemblyIdentity
+    type="win32"
+    name="ServiceCPlugin"
+    version="1.0.0.0" />
+
+  <file name="ServiceCPlugin.comhost.dll">
+
+    <comClass
+      clsid="{C2B3D4E5-6F7A-8B9C-0D1E-F2A3B4C5D6E7}"
+      threadingModel="Both"
+      progid="ComPluginDemo.ServiceC"
+      description="ServiceC Plugin - 编码/哈希工具服务" />
+
+  </file>
+
+  <comInterfaceExternalProxyStub
+    iid="{B1A2C3D4-5E6F-7A8B-9C0D-E1F2A3B4C5D6}"
+    name="IServiceCPlugin"
+    proxyStubClsid32="{00020424-0000-0000-C000-000000000046}" />
+
+</assembly>

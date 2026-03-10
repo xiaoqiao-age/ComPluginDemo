@@ -1,0 +1,20 @@
+{
+  "Plugins": [
+    {
+      "ProgId": "ComPluginDemo.Calculator",
+      "ManifestPath": "CSharpComPlugin\\CSharpComPlugin.manifest"
+    },
+    {
+      "ProgId": "VB6ComPlugin.StringProcessor",
+      "ManifestPath": "VB6ComPlugin\\VB6ComPlugin.manifest"
+    },
+    {
+      "ProgId": "ComPluginDemo.ServiceC",
+      "ManifestPath": "ServiceCPlugin\\ServiceCPlugin.manifest"
+    },
+    {
+      "ProgId": "ComPluginDemo.OrchestratorB",
+      "ManifestPath": "OrchestratorBPlugin\\OrchestratorBPlugin.manifest"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+.vs/
+src/ComPluginHost/bin/
+src/CSharpComPlugin/obj/
+src/OrchestratorBPlugin/bin/
+src/OrchestratorBPlugin/obj/
+src/ServiceCPlugin/bin/
+src/ServiceCPlugin/obj/
+src/ComPluginHost/obj/
+src/CSharpComPlugin/bin/

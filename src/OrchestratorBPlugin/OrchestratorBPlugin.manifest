@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  OrchestratorBPlugin - SxS 组件清单 (免注册 COM)
+
+  此清单声明 OrchestratorBPlugin.comhost.dll 中的 COM 类，
+  并声明对 ServiceCPlugin 的 SxS 依赖，使 OrchestratorB 能够
+  独立通过 ProgID 创建 ServiceC COM 对象。
+
+  Windows SxS 加载器搜索路径:
+    1. 与 exe 同目录: OrchestratorBPlugin.manifest
+    2. 同名子目录:    OrchestratorBPlugin\OrchestratorBPlugin.manifest
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <assemblyIdentity
+    type="win32"
+    name="OrchestratorBPlugin"
+    version="1.0.0.0" />
+
+  <file name="OrchestratorBPlugin.comhost.dll">
+
+    <comClass
+      clsid="{E4D5F6A7-8B9C-0D1E-2F3A-B4C5D6E7F8A9}"
+      threadingModel="Both"
+      progid="ComPluginDemo.OrchestratorB"
+      description="OrchestratorB Plugin - 编排器" />
+
+  </file>
+
+  <comInterfaceExternalProxyStub
+    iid="{D3C4E5F6-7A8B-9C0D-1E2F-A3B4C5D6E7F8}"
+    name="IOrchestratorBPlugin"
+    proxyStubClsid32="{00020424-0000-0000-C000-000000000046}" />
+
+  <!-- OrchestratorB 依赖 ServiceC，SxS 会在 OrchestratorBPlugin\ServiceCPlugin\ 下搜索 -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity type="win32" name="ServiceCPlugin" version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+
+</assembly>

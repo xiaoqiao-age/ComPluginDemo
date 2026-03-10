@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity type="win32" name="VB6ComPlugin" version="1.0.0.0" />
+  <file name="VB6ComPlugin.dll">
+    <comClass
+      clsid="{7A5544D3-6438-4BDB-BBEC-A3C01494BFA5}"
+      threadingModel="Apartment"
+      progid="VB6ComPlugin.StringProcessor"
+      description="StringProcessor Plugin - VB6" />
+  </file>
+  <!-- VB6 can CreateObject("ComPluginDemo.Calculator") via this dependency -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity type="win32" name="CSharpComPlugin" version="1.0.0.0" />
+    </dependentAssembly>
+  </dependency>
+</assembly>
