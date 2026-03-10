@@ -1,9 +1,38 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio
 .vs/
-src/ComPluginHost/bin/
-src/CSharpComPlugin/obj/
-src/OrchestratorBPlugin/bin/
-src/OrchestratorBPlugin/obj/
-src/ServiceCPlugin/bin/
-src/ServiceCPlugin/obj/
-src/ComPluginHost/obj/
-src/CSharpComPlugin/bin/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+**/packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# VB6 IDE workspace (user-specific)
+*.vbw
+
+# VB6 source safe binding
+MSSCCPRJ.SCC
+
+# VB6 linker artifacts
+*.exp
+*.lib
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
